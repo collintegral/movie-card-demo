@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Favorite Movies</title>
+  <style type="text/css">
+    button,
+    div,
+    form,
+    input {
+      margin: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>Movie Search</h1>
+
+    <!-- Movies will get dumped here -->
+    <div id="buttons-view"></div>
+
+    <form id="movie-form">
+      <label for="movie-input">Add a Movie, Yo!</label>
+      <input type="text" id="movie-input"><br>
+
+      <!-- Button triggers new movie to be added -->
+      <input id="add-movie" type="submit" value="Add a Movie, Yo!">
+    </form>
+    <div id="current-movie"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+      // Initial array of movies
+      var movies = ["The Matrix", "The Notebook", "Mr. Nobody", "The Lion King"];
+      var buttonsArr = []
+      var movieInput = $("#movie-input");
+      var buttonsView = $("#buttons-view");
+      var currentMovie = $("#current-movie");
+      
+      // Function for displaying movie data
+      function renderButton(title) {
+        buttonsArr.push($("<button>").text(title).addClass("movie-button"));
+
+        buttonsView.empty();
+        buttonsArr.forEach(function(t) {buttonsView.append(t)});
+      }
+
+      // This function handles events where one button is clicked
+      $("#add-movie").on("click", function() {
+        event.preventDefault();
+
+        var newMovie = movieInput.val().trim();
+
+        renderButton(newMovie);
+        movieInput.text("");
+      });
+
+      // Calling the renderButtons function to display the initial list of movies
+      movies.forEach(renderButton);
+
+      $("#buttons-view").on("click", ".movie-button", function (event) {
+        currentClick = event.currentTarget.firstChild.data;
+
+        var queryURL = "https://www.omdbapi.com/?t=" + currentClick + "&apikey=trilogy";
+        $.ajax({
+          url: queryURL,
+          method: "GET"
+        }).then(addMovieInfo);
+      });
+
+      function addMovieInfo(response) {
+        console.log(response);
+        var currentEntry = [];
+
+        currentEntry.push($("<p>" + response.Plot + "</p>"));
+        currentEntry.push($("<p>" + response.Released + "</p>"));
+        currentEntry.push($("<p>" + response.Rated + "</p>"));
+        currentEntry.push($("<p>" + response.Title + "</p>"));
+        currentEntry.push($("<img src=" + response.Poster + ">"));
+
+        currentEntry.forEach(function(entry) {currentMovie.prepend(entry)});
+      }
+
+    </script>
+  </div>
+</body>
+
+</html>
